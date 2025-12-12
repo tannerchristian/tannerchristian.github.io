@@ -1,0 +1,93 @@
+/* Global styles */
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+  background: linear-gradient(135deg, #f9fafb, #e3f2fd);
+}
+
+/* Wrapper for the whole page */
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  background-color: #0d47a1;
+  color: #ffffff;
+  border-radius: 8px;
+}
+
+.header a {
+  color: #ffeb3b;
+  text-decoration: none;
+}
+
+.header a:hover {
+  text-decoration: underline;
+}
+
+/* Main content area */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Card-like divs */
+.card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Example of specific div styling */
+.image-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image styling */
+.featured-image {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.75rem 0;
+}
+
+/* Smaller helper text */
+.small-text {
+  font-size: 0.85rem;
+  color: #555;
+}
+
+/* Video container for responsive YouTube embed */
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  width: 100%;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 0.75rem;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #555;
+}

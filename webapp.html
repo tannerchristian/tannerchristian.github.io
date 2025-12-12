@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Peak Habits | Daily Habit Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ------- GLOBAL ------- */
+    :root {
+      --bg: #0b1020;
+      --card: #141b2f;
+      --accent: #4cafef;
+      --accent-soft: rgba(76, 175, 239, 0.15);
+      --text-main: #f5f7fa;
+      --text-muted: #9ea4b8;
+      --danger: #ef5350;
+      --success: #66bb6a;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, sans-serif;
+      background: radial-gradient(circle at top, #151a33, #050712);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* ------- APP WRAPPER ------- */
+    .app-shell {
+      width: 100%;
+      max-width: 900px;
+      background: linear-gradient(145deg, #151c32, #090d1a);
+      border-radius: 20px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
+      padding: 1.75rem 1.75rem 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .app-header h1 {
+      font-size: 1.6rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .app-header span.badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid rgba(76, 175, 239, 0.6);
+    }
+
+    .nav-links {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .nav-links a {
+      margin-left: 0.5rem;
+    }
+
+    /* ------- LAYOUT ------- */
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 780px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--card);
+      border-radius: var(--radius);
+      padding: 1rem 1.15rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card h2 {
+      font-size: 1.05rem;
+      margin: 0 0 0.5rem;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+    }
+
+    /* ------- HABIT LIST ------- */
+    .habit-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.25rem 0 0.5rem;
+      max-height: 260px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-soft) transparent;
+    }
+
+    .habit-list::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .habit-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .habit-list::-webkit-scrollbar-thumb {
+      background: var(--accent-soft);
+      border-radius: 999px;
+    }
+
+    .habit-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.45rem 0.4rem;
+      border-radius: 9px;
+      transition: background 0.15s ease, transform 0.08s ease;
+    }
+
+    .habit-item.completed {
+      background: rgba(102, 187, 106, 0.1);
+    }
+
+    .habit-main {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .habit-title {
+      font-size: 0.9rem;
+    }
+
+    .habit-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .habit-meta {
+      text-align: right;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    .habit-meta strong {
+      color: var(--success);
+    }
+
+    /* Custom checkbox */
+    .checkbox-wrap {
+      position: relative;
+      width: 20px;
+      height: 20px;
+    }
+
+    .checkbox-wrap input {
+      opacity: 0;
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+    }
+
+    .checkbox-faux {
+      width: 100%;
+      height: 100%;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: transparent;
+      transition: all 0.12s ease;
+    }
+
+    .checkbox-wrap input:checked + .checkbox-faux {
+      background: linear-gradient(135deg, var(--success), #2e7d32);
+      border-color: rgba(0, 0, 0, 0.35);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ------- ADD HABIT ------- */
+    .add-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+    }
+
+    .add-row input[type="text"] {
+      flex: 1;
+      padding: 0.4rem 0.55rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(7, 9, 18, 0.8);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .add-row input[type="text"]::placeholder {
+      color: rgba(158, 164, 184, 0.75);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      white-space: nowrap;
+      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: none;
+    }
+
+    /* ------- SUMMARY ------- */
+    .summary-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-top: 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pill.highlight {
+      border-color: rgba(102, 187, 106, 0.7);
+      background: rgba(102, 187, 106, 0.12);
+      color: var(--success);
+    }
+
+    .pill.danger {
+      border-color: rgba(239, 83, 80, 0.7);
+      background: rgba(239, 83, 80, 0.12);
+      color: var(--danger);
+    }
+
+    .summary-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    /* ------- CHART CARD ------- */
+    .chart-wrapper {
+      margin-top: 0.4rem;
+      background: radial-gradient(circle at top left, #1e2743, #0a0f1f);
+      border-radius: 12px;
+      padding: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    /* ------- FOOTER ------- */
+    .app-footer {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>Peak Habits <span class="badge">Daily Tracker</span></h1>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">
+          Check off habits, track streaks, and watch your consistency trend over time.
+        </p>
+      </div>
+      <div class="nav-links">
+        <span>Navigation:</span>
+        <a href="index.html">Main Site</a> |
+        <a href="scratch.html">Scratch Page</a>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- LEFT: Habits & Today -->
+      <section class="card">
+        <h2>Today's Habits</h2>
+        <p>
+          Tap the box to mark a habit as done for <strong id="todayLabel"></strong>.
+          You can also add your own custom habits below.
+        </p>
+
+        <ul class="habit-list" id="habitList"></ul>
+
+        <div class="add-row">
+          <input
+            type="text"
+            id="newHabitInput"
+            placeholder="Add a new habit (e.g., Stretch 10 minutes)"
+          />
+          <button class="btn" id="addHabitBtn">+ Add</button>
+        </div>
+
+        <div class="summary-row" style="margin-top: 0.8rem;">
+          <div class="pill highlight" id="completionPill">0 / 0 complete</div>
+          <div class="pill" id="percentPill">0% completion</div>
+          <button class="btn secondary" id="resetTodayBtn" title="Uncheck all for today">
+            Reset Today
+          </button>
+        </div>
+
+        <p class="summary-note" id="summaryNote">
+          Start checking off habits to see your completion stats and trend.
+        </p>
+      </section>
+
+      <!-- RIGHT: Trend Chart -->
+      <section class="card">
+        <h2>7-Day Consistency Trend</h2>
+        <p>
+          This chart shows your daily completion percentage over the last seven days,
+          including today. Data is stored locally in your browser (no server needed).
+        </p>
+
+        <div class="chart-wrapper">
+          <canvas id="habitChart" height="180"></canvas>
+        </div>
+
+        <p class="summary-note">
+          Tip: Come back each day, update your habits, and watch the line climb as your
+          consistency improves.
+        </p>
+      </section>
+    </div>
+
+    <footer class="app-footer">
+      <span>
+        Built in collaboration with AI & customized by Tanner for IS 201.
+      </span>
+      <span id="footerDate"></span>
+    </footer>
+  </div>
+
+  <script>
+    /* ======================
+       DATA + STORAGE LAYER
+       ====================== */
+
+    const STORAGE_KEY = "peakHabitsData_v1";
+
+    // Default habits to get you started
+    const defaultHabits = [
+      { id: "water", name: "Drink 8+ cups of water" },
+      { id: "run", name: "Cardio or run 20+ minutes" },
+      { id: "study", name: "Focused study / deep work (45+ minutes)" },
+      { id: "sleep", name: "7+ hours of quality sleep" },
+      { id: "gratitude", name: "Write 3 things you're grateful for" }
+    ];
+
+    function todayKey() {
+      const d = new Date();
+      // YYYY-MM-DD
+      return d.toISOString().slice(0, 10);
+    }
+
+    function loadData() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        return {
+          habits: defaultHabits,
+          // days[dateKey] = { completed: {habitId: true/false} }
+          days: {}
+        };
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        // Light sanity check
+        if (!parsed.habits || !Array.isArray(parsed.habits) || !parsed.days) {
+          throw new Error("Malformed data");
+        }
+        return parsed;
+      } catch {
+        return {
+          habits: defaultHabits,
+          days: {}
+        };
+      }
+    }
+
+    function saveData(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    /* ======================
+       STATE & ELEMENTS
+       ====================== */
+
+    let state = loadData();
+    const habitListEl = document.getElementById("habitList");
+    const newHabitInput = document.getElementById("newHabitInput");
+    const addHabitBtn = document.getElementById("addHabitBtn");
+    const completionPill = document.getElementById("completionPill");
+    const percentPill = document.getElementById("percentPill");
+    const summaryNote = document.getElementById("summaryNote");
+    const resetTodayBtn = document.getElementById("resetTodayBtn");
+    const todayLabel = document.getElementById("todayLabel");
+    const footerDate = document.getElementById("footerDate");
+
+    footerDate.textContent = "Local time: " + new Date().toLocaleString();
+    todayLabel.textContent = new Date().toLocaleDateString(undefined, {
+      weekday: "short",
+      month: "short",
+      day: "numeric"
+    });
+
+    // Ensure today's entry exists in state
+    function ensureTodayEntry() {
+      const key = todayKey();
+      if (!state.days[key]) {
+        const completed = {};
+        state.habits.forEach(h => (completed[h.id] = false));
+        state.days[key] = { completed };
+      } else {
+        // Ensure new habits appear for today
+        state.habits.forEach(h => {
+          if (!state.days[key].completed.hasOwnProperty(h.id)) {
+            state.days[key].completed[h.id] = false;
+          }
+        });
+      }
+    }
+
+    ensureTodayEntry();
+    saveData(state);
+
+    /* ======================
+       UI RENDERING
+       ====================== */
+
+    function renderHabits() {
+      habitListEl.innerHTML = "";
+      const key = todayKey();
+      const todayData = state.days[key];
+
+      state.habits.forEach(habit => {
+        const li = document.createElement("li");
+        li.className = "habit-item";
+
+        const main = document.createElement("div");
+        main.className = "habit-main";
+
+        const checkboxWrap = document.createElement("label");
+        checkboxWrap.className = "checkbox-wrap";
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = !!todayData.completed[habit.id];
+
+        const faux = document.createElement("div");
+        faux.className = "checkbox-faux";
+        faux.textContent = "✓";
+
+        checkboxWrap.appendChild(input);
+        checkboxWrap.appendChild(faux);
+
+        const textWrap = document.createElement("div");
+        const title = document.createElement("div");
+        title.className = "habit-title";
+        title.textContent = habit.name;
+
+        const sub = document.createElement("div");
+        sub.className = "habit-sub";
+        sub.textContent = "Tap to toggle for today";
+
+        textWrap.appendChild(title);
+        textWrap.appendChild(sub);
+
+        main.appendChild(checkboxWrap);
+        main.appendChild(textWrap);
+
+        // meta
+        const meta = document.createElement("div");
+        meta.className = "habit-meta";
+        const completedCount = countTotalCompletionsForHabit(habit.id);
+        meta.innerHTML = "<strong>" + completedCount + "</strong> days done";
+
+        li.appendChild(main);
+        li.appendChild(meta);
+
+        // handle styling if completed
+        if (input.checked) {
+          li.classList.add("completed");
+        }
+
+        input.addEventListener("change", () => {
+          todayData.completed[habit.id] = input.checked;
+          if (input.checked) {
+            li.classList.add("completed");
+          } else {
+            li.classList.remove("completed");
+          }
+          saveData(state);
+          updateSummary();
+          updateChart();
+        });
+
+        habitListEl.appendChild(li);
+      });
+    }
+
+    function countTotalCompletionsForHabit(habitId) {
+      let count = 0;
+      for (const dateKey in state.days) {
+        if (state.days[dateKey].completed[habitId]) count++;
+      }
+      return count;
+    }
+
+    function updateSummary() {
+      const key = todayKey();
+      const todayData = state.days[key];
+      const totalHabits = state.habits.length;
+      const completed = Object.values(todayData.completed).filter(Boolean).length;
+      const pct = totalHabits === 0 ? 0 : Math.round((completed / totalHabits) * 100);
+
+      completionPill.textContent = `${completed} / ${totalHabits} complete`;
+      percentPill.textContent = `${pct}% completion`;
+
+      if (pct === 100 && totalHabits > 0) {
+        summaryNote.textContent =
+          "Perfect day! Consider this a full W. Keep the streak alive tomorrow.";
+        completionPill.classList.add("highlight");
+        completionPill.classList.remove("danger");
+      } else if (pct === 0) {
+        summaryNote.textContent =
+          "Everyone starts somewhere. Check off one habit to build momentum.";
+        completionPill.classList.remove("highlight");
+        completionPill.classList.add("danger");
+      } else {
+        summaryNote.textContent =
+          "Nice progress. Keep nudging that completion percentage up over time.";
+        completionPill.classList.add("highlight");
+        completionPill.classList.remove("danger");
+      }
+    }
+
+    /* ======================
+       ADD HABIT / RESET
+       ====================== */
+
+    addHabitBtn.addEventListener("click", () => {
+      const name = newHabitInput.value.trim();
+      if (!name) return;
+      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
+      state.habits.push({ id, name });
+
+      // Add to every existing day as not completed
+      for (const dateKey in state.days) {
+        state.days[dateKey].completed[id] = false;
+      }
+
+      newHabitInput.value = "";
+      saveData(state);
+      ensureTodayEntry();
+      renderHabits();
+      updateSummary();
+      updateChart();
+    });
+
+    newHabitInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        addHabitBtn.click();
+      }
+    });
+
+    resetTodayBtn.addEventListener("click", () => {
+      if (!confirm("Clear all completed habits for today?")) return;
+      const key = todayKey();
+      const todayData = state.days[key];
+      Object.keys(todayData.completed).forEach(hid => {
+        todayData.completed[hid] = false;
+      });
+      saveData(state);
+      renderHabits();
+      updateSummary();
+      updateChart();
+    });
+
+    /* ======================
+       CHART: 7-DAY TREND
+       ====================== */
+
+    const habitChartCtx = document.getElementById("habitChart").getContext("2d");
+    let habitChart;
+
+    function getLast7Days() {
+      const days = [];
+      const now = new Date();
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        days.push({ key, label: d.toLocaleDateString(undefined, { month: "short", day: "numeric" }) });
+      }
+      return days;
+    }
+
+    function computeCompletionForDate(dateKey) {
+      const entry = state.days[dateKey];
+      if (!entry) return 0;
+      const totalHabits = state.habits.length;
+      if (totalHabits === 0) return 0;
+      const completed = Object.values(entry.completed).filter(Boolean).length;
+      return Math.round((completed / totalHabits) * 100);
+    }
+
+    function initChart() {
+      const last7 = getLast7Days();
+      const labels = last7.map(d => d.label);
+      const data = last7.map(d => computeCompletionForDate(d.key));
+
+      habitChart = new Chart(habitChartCtx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Daily completion %",
+              data,
+              fill: true,
+              tension: 0.35,
+              borderColor: "#4cafef",
+              backgroundColor: "rgba(76, 175, 239, 0.20)",
+              pointBackgroundColor: "#ffffff",
+              pointRadius: 3,
+              pointHoverRadius: 4
+            }
+          ]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                color: "#cfd8dc",
+                callback: v => v + "%"
+              },
+              grid: {
+                color: "rgba(255,255,255,0.06)"
+              }
+            },
+            x: {
+              ticks: {
+                color: "#cfd8dc"
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChart() {
+      if (!habitChart) return;
+      const last7 = getLast7Days();
+      habitChart.data.labels = last7.map(d => d.label);
+      habitChart.data.datasets[0].data = last7.map(d => computeCompletionForDate(d.key));
+      habitChart.update();
+    }
+
+    /* ======================
+       INITIALIZE APP
+       ====================== */
+
+    renderHabits();
+    updateSummary();
+    initChart();
+  </script>
+</body>
+</html>

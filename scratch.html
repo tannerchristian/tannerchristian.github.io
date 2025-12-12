@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tanner's Scratch Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Custom stylesheet YOU wrote -->
+  <link rel="stylesheet" href="scratch.css" />
+</head>
+<body id="top">
+  <div class="page-wrapper">
+    <!-- HEADER / NAV -->
+    <header class="header">
+      <h1>Tanner's Trail & Training Lab</h1>
+      <p>A playground page built entirely from scratch.</p>
+      <nav>
+        <a href="index.html">Back to Main Site</a> |
+        <a href="webapp.html">Web App</a> |
+        <a href="#tableau-section">Jump to Tableau Graph</a>
+      </nav>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="content">
+      <!-- DIV 1 -->
+      <div class="card">
+        <h2>My Running & Training Priorities</h2>
+        <p>
+          I love optimizing training, recovery, and performance. Here's how I think about
+          improving as an athlete:
+        </p>
+
+        <!-- Ordered list with embedded unordered list -->
+        <ol>
+          <li>
+            Build a strong foundation
+            <ul>
+              <li>Consistent weekly mileage</li>
+              <li>Easy runs that actually feel easy</li>
+              <li>Gradual progression (no hero weeks)</li>
+            </ul>
+          </li>
+          <li>
+            Layer in smart intensity
+            <ul>
+              <li>Intervals and tempo work</li>
+              <li>Race-specific workouts</li>
+              <li>Planned deload weeks</li>
+            </ul>
+          </li>
+          <li>
+            Lock in recovery & mindset
+            <ul>
+              <li>Sleep, nutrition, and hydration</li>
+              <li>Mobility and prehab work</li>
+              <li>Confidence and race strategy</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+
+      <!-- DIV 2 -->
+      <div class="card image-block">
+        <h2>Favorite Training Environment</h2>
+        <p>
+          Trails, mountains, crisp air, and long steady climbs. Here's a photo that inspires the
+          kind of environment I love training in:
+        </p>
+        <!-- At least one image not from Bootstrap theme -->
+        <img src="https://mail.google.com/mail/u/2?ui=2&ik=9f97b5b0c1&attid=0.1&permmsgid=msg-f:1851184005993274707&th=19b0ba0ba31d1d53&view=fimg&fur=ip&permmsgid=msg-f:1851184005993274707&sz=s0-l75-ft&attbid=ANGjdJ-btOMnXvrSh0WojDULm3SOxXh091ed7uMvLrrWRJR_XbuuqJ1rO4qosk77YzzLRzHJo_3T2ffbi1KTQzBfbpC9h2x9jUe2L7OTtCjOKg2PONTmidNkT5z4epY&disp=emb&realattid=082D16EA-2822-461A-905B-9A3BAB9A2641&zw" alt="Scenic trail and mountains" class="featured-image" />
+
+      </div>
+
+      <!-- DIV 3 -->
+      <div class="card">
+        <h2>Grit it done</h2>
+
+        <!-- Embedded YouTube video -->
+        <div class="video-container">
+          <iframe
+            src="https://www.youtube.com/embed/MDEKMFSBcWo"
+            title="Fast Boy"
+            frameborder="0"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <!-- ANCHOR TARGET -->
+      <div class="card" id="tableau-section">
+        <h2>Running Changes You!</h2>
+        <p>
+          Look at just one example of how someone changed their entire life because of running and now has become a new man. 
+        </p>
+
+        <!-- Tableau Embed Placeholder -->
+        <!-- Replace this block with the embed code you get from Tableau Public -->
+<div class='tableauPlaceholder' id='viz1765427351233' style='position: relative'><noscript><a href='#'><img alt='track ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;54&#47;54T9DPY5D&#47;1_rss.png' style='border: none' /></a></noscript><object class='tableauViz'  style='display:none;'><param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> <param name='embed_code_version' value='3' /> <param name='path' value='shared&#47;54T9DPY5D' /> <param name='toolbar' value='yes' /><param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;54&#47;54T9DPY5D&#47;1.png' /> <param name='animate_transition' value='yes' /><param name='display_static_image' value='yes' /><param name='display_spinner' value='yes' /><param name='display_overlay' value='yes' /><param name='display_count' value='yes' /><param name='language' value='en-US' /></object></div>                <script type='text/javascript'>                    var divElement = document.getElementById('viz1765427351233');                    var vizElement = divElement.getElementsByTagName('object')[0];                    vizElement.style.width='1200px';vizElement.style.height='1027px';                    var scriptElement = document.createElement('script');                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';                    vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
+
+        <!-- On-page anchor link -->
+        <p class="small-text">
+          <a href="#top">Back to top of page</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>&copy; <span id="year"></span> Tanner's Scratch Page</p>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
